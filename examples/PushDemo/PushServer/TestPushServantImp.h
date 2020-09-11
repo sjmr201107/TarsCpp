@@ -5,31 +5,31 @@
 //#include "TestPushServant.h"
 
 /**
- *
- *
- */
+*
+*
+*/
 class TestPushServantImp : public  tars::Servant
 {
 public:
     /**
-     *
-     */
+    *
+    */
     virtual ~TestPushServantImp() {}
 
     /**
-     *
-     */
+    *
+    */
     virtual void initialize();
 
     /**
-     *
-     */
+    *
+    */
     virtual void destroy();
 
     /**
-     *
-     */
-    virtual int test(tars::TarsCurrentPtr current) { return 0;};
+    *
+    */
+    virtual int test(tars::TarsCurrentPtr current) { return 0; };
 
 
     //重载Servant的doRequest方法

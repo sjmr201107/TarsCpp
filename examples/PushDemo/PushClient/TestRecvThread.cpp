@@ -1,5 +1,6 @@
 ﻿#include "TestRecvThread.h"
 #include <iostream>
+#include "struct.h"
 //#include <arpa/inet.h>
 
 /*
@@ -109,11 +110,17 @@ int TestPushCallBack::onDispatch(ReqMessagePtr msg)
 }
 
 RecvThread::RecvThread(int second):_second(second), _bTerminate(false)
-{
-	string sObjName = "TestApp.PushServer.TestPushServantObj@tcp -h 127.0.0.1 -t 60000 -p 9300";
+{   
+	string sObjName = "TestApp.PushServer.TestPushServantObj@tcp -h 192.168.1.24 -t 60000 -p 10099";
 
     _prx = _comm.stringToProxy<ServantPrx>(sObjName);
+    /*_comm = new Communicator();
+    _comm->setProperty("property", "tars.tarsproperty.PropertyObj");
+    _comm->setProperty("locator", "tars.tarsregistry.QueryObj@tcp -h 192.168.1.119 -p 17890:tcp -h 192.168.1.24 -p 17890:tcp -h 192.168.1.69 -p 17890");
 
+    _prx = _comm->stringToProxy<tars::ServantPrx>("TestApp.PushServer.TestPushServantObj");
+    _prx->tars_timeout(10000);
+    _prx->tars_async_timeout(10000);*/
 	ProxyProtocol prot;
     prot.requestFunc = pushRequest;
     prot.responseFunc = pushResponse;
@@ -125,8 +132,14 @@ void RecvThread::run(void)
 {
 	TestPushCallBackPtr cbPush = new TestPushCallBack();
 	_prx->tars_set_push_callback(cbPush);	
+	//string buf("heartbeat");
 
-	string buf("heartbeat");
+    TestApp::UserInfo usr;
+    usr.userId = "2021";
+    usr.userName = "client2";
+    usr.msg = 123;
+
+    string buf = usr.writeToJsonString();
 
 	time_t n = TNOW;
 
@@ -150,13 +163,13 @@ void RecvThread::run(void)
 
 		if(TNOW - n >= _second)
 		{
-			_bTerminate = true;
-			break;
+			//_bTerminate = true;
+			//break;
 		}
 
 		{
             TC_ThreadLock::Lock sync(*this);
-            timedWait(500);
+            timedWait(2000);
 		}
 	}
 }

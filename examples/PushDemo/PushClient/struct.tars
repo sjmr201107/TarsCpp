@@ -1,0 +1,10 @@
+module TestApp
+{
+    struct UserInfo
+    {
+        1  require string      userId="";
+        2  require string      userName="";
+		3  require int         msg;
+    };
+
+}; 

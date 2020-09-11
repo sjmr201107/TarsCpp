@@ -9,27 +9,27 @@
 using namespace tars;
 
 /**
- *
- **/
+*
+**/
 class TestPushServer : public Application
 {
 public:
     /**
-     *
-     **/
+    *
+    **/
     virtual ~TestPushServer() {};
 
     /**
-     *
-     **/
+    *
+    **/
     virtual void initialize();
 
     /**
-     *
-     **/
+    *
+    **/
     virtual void destroyApp();
 
-    private:
+private:
     //用于push消息的线程
     PushInfoThread  pushThread;
 
