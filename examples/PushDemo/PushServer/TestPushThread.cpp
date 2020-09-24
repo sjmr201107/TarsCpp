@@ -67,24 +67,24 @@ void PushInfoThread::run(void)
         (PushUser::mapMutex).lock();
         for (auto& it : PushUser::pushUser)
         {
-            if (it.first == "2020")
+            if (it.first == "matic")
             {
-                string pushinfo = it.second.userName + "'s  callback ";
+                string pushinfo = it.second.brokerType + "'s  callback ";
                 string abc = setPushMsg(pushinfo);
                 it.second.currPtr->sendResponse(abc.c_str(), abc.size());
             }
-            else if (it.first == "2021")
+            else if (it.first == "cats")
             {
-                string pushinfo = it.second.userName + "'s  callback ";
+                string pushinfo = it.second.brokerType + "'s  callback ";
                 string abc = setPushMsg(pushinfo);
                 it.second.currPtr->sendResponse(abc.c_str(), abc.size());
             }
         }
         (PushUser::mapMutex).unlock();
-        // if (!(PushUser::pushUser).empty())
-        // {
-        // 	LOG->debug() << "sendResponse: " << _sPushInfo.size() <<" user count="<<PushUser::pushUser.size()<<endl;
-        // }
+        if (!(PushUser::pushUser).empty())
+        {
+        	LOG->debug() <<" user count="<<PushUser::pushUser.size()<<endl;
+        }
         {
             TC_ThreadLock::Lock sync(*this);
             timedWait(5000);
