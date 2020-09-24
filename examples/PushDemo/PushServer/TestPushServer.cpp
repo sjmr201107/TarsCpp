@@ -39,7 +39,7 @@ static TC_NetWorkBuffer::PACKET_TYPE parse(TC_NetWorkBuffer &in, vector<char> &o
 
     in.getHeader(iHeaderLen, out);
     in.moveHeader(iHeaderLen);
-    LOG->debug() << "parse:" << header.data() << endl;
+    //LOG->debug() << "parse:" << header.data() << endl;
     return TC_NetWorkBuffer::PACKET_FULL;
 }
 

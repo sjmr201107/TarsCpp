@@ -6,8 +6,7 @@
 typedef struct ServerUserInfo
 {
     TarsCurrentPtr currPtr;
-    string userName;
-    string msg;
+    string brokerType;
 } SerUser;
 
 class PushUser

@@ -28,23 +28,31 @@ int TestPushServantImp::doRequest(tars::TarsCurrentPtr current, vector<char>& re
     string sBuf;
     sBuf.assign(request.data() + 8, request.size());
     //cout<<sBuf<<endl;
-    TestApp::UserInfo user;
-    user.readFromJsonString(sBuf);
+    TestApp::MsgStgInfo stginfo;
+    stginfo.readFromJsonString(sBuf);
     //cout<<sBuf<<" "<<user.userId<<" "<<user.userName<<" "<<user.msg<<endl;
     //保存客户端的信息，以便对客户端进行push消息
     //stringstream keystr;
     //keystr<<current->getIp()<<":"<<current->getPort();
     (PushUser::mapMutex).lock();
-    map<string, SerUser>::iterator it = PushUser::pushUser.find(user.userId);
+    map<string, SerUser>::iterator it = PushUser::pushUser.find(stginfo.brokerType);
     if (it == PushUser::pushUser.end())
     {
         ServerUserInfo userInfo;
         userInfo.currPtr = current;
-        userInfo.userName = user.userName;
-        userInfo.msg = user.msg;
-        PushUser::pushUser.insert(map<string, SerUser>::value_type(user.userId, userInfo));
-        LOG->debug() << "connect user: " << user.userId << " uid:" << current->getUId() << " hostName:" << current->getHostName() << endl;
+        userInfo.brokerType = stginfo.brokerType;
+        PushUser::pushUser.insert(map<string, SerUser>::value_type(stginfo.brokerType, userInfo));
+        LOG->debug() << "connect user: " << stginfo.brokerType << " uid:" << current->getUId() << " hostName:" << current->getHostName() << endl;
     }
+    if (stginfo.msgType == "heart")
+    {
+        LOG->debug() << stginfo.brokerType <<"'s heart"<<endl;
+    }
+    else if(stginfo.msgType == "stgrsp")
+    {
+        LOG->debug() << stginfo.brokerType <<"'s rsp"<<endl;
+    }
+    
     (PushUser::mapMutex).unlock();
     //LOG->debug() << "request:"<<abc<<endl;
     return 0;
@@ -56,12 +64,18 @@ int TestPushServantImp::doClose(TarsCurrentPtr current)
     stringstream keystr;
     keystr << current->getIp() << ":" << current->getPort();
     (PushUser::mapMutex).lock();
-    map<string, SerUser>::iterator it = PushUser::pushUser.find(keystr.str());
-    if (it != PushUser::pushUser.end())
+    for (auto& it : PushUser::pushUser)
     {
-        PushUser::pushUser.erase(it);
-        LOG->debug() << "close ip: " << keystr.str() << endl;
+        stringstream ipport;
+        ipport << it.second.currPtr->getIp() << ":" << it.second.currPtr->getPort();
+        if (ipport.str() == keystr.str())
+        {
+            PushUser::pushUser.erase(it.first);
+            LOG->debug() << "close ip: " << keystr.str() << endl;
+        }
     }
+    
+
     (PushUser::mapMutex).unlock();
 
     return 0;
