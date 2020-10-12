@@ -111,7 +111,7 @@ int TestPushCallBack::onDispatch(ReqMessagePtr msg)
 
 RecvThread::RecvThread(int second):_second(second), _bTerminate(false)
 {   
-	string sObjName = "TestApp.PushServer.TestPushServantObj@tcp -h 192.168.1.24 -t 60000 -p 10099";
+	string sObjName = "TestApp.PushServer.TestPushServantObj@tcp -h 192.168.1.72 -t 60000 -p 10099";
 
     _prx = _comm.stringToProxy<ServantPrx>(sObjName);
     /*_comm = new Communicator();
@@ -134,12 +134,31 @@ void RecvThread::run(void)
 	_prx->tars_set_push_callback(cbPush);	
 	//string buf("heartbeat");
 
-    TestApp::UserInfo usr;
-    usr.userId = "2021";
-    usr.userName = "client2";
-    usr.msg = 123;
+    string brokerType = "cats";
 
-    string buf = usr.writeToJsonString();
+    TestApp::StgInfo stginfo;
+    stginfo.brokerType = brokerType;
+    stginfo.stginfo = "heart beat";
+    string stgbuf = stginfo.writeToJsonString();
+
+    TestApp::MsgStgInfo msgstg;
+    msgstg.msgType = "heart";
+    msgstg.brokerType = brokerType;
+    msgstg.msg = stgbuf;
+
+    string buf = msgstg.writeToJsonString();
+
+
+    TestApp::StgRsp rsp;
+    rsp.brokerType = brokerType;
+    rsp.orderId = "3388";
+    rsp.rspmsg = "rspmsg";
+    string rspbuf = rsp.writeToJsonString();
+
+    msgstg.msgType = "stgrsp";
+    msgstg.brokerType = brokerType;
+    msgstg.msg = rsp.writeToJsonString();
+    string buf1 = msgstg.writeToJsonString();
 
 	time_t n = TNOW;
 
@@ -150,6 +169,12 @@ void RecvThread::run(void)
 			{
 				TestPushCallBackPtr cb = new TestPushCallBack();
 				_prx->rpc_call_async(_prx->tars_gen_requestid(), "printResult", buf.c_str(), buf.length(), cb);
+                {
+                    TC_ThreadLock::Lock sync(*this);
+                    timedWait(2000);
+                    //发送brokerType
+                    _prx->rpc_call_async(_prx->tars_gen_requestid(), "printResult", buf1.c_str(), buf1.length(), cb);
+                }
 			}
 			catch(TarsException& e)
 			{     

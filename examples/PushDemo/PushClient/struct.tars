@@ -1,10 +1,29 @@
 module TestApp
 {
-    struct UserInfo
+	struct MsgStgInfo
+	{
+		1 require string 	msgType="";
+		2 require string    brokerType="";
+		3 require string 	msg="";
+	};
+	
+    struct StgInfo
     {
-        1  require string      userId="";
-        2  require string      userName="";
-		3  require int         msg;
+        1  require string      brokerType="";
+		2  require string      stginfo="";
     };
-
+	
+	struct StgRsp
+	{
+		1  require string 	   brokerType="";
+        2  require string      orderId="";
+        3  require string      rspmsg="";
+	};
+	
+	struct SlpReq
+	{
+		1  require string 	   brokerType="";
+        2  require string      accountId="";
+        3  require string      orderId="";
+	};
 }; 
