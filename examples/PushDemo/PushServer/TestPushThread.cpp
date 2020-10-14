@@ -83,7 +83,7 @@ void PushInfoThread::run(void)
         (PushUser::mapMutex).unlock();
         if (!(PushUser::pushUser).empty())
         {
-        	LOG->debug() <<" user count="<<PushUser::pushUser.size()<<endl;
+            //LOG->debug() <<" user count="<<PushUser::pushUser.size()<<endl;
         }
         {
             TC_ThreadLock::Lock sync(*this);

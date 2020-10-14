@@ -46,13 +46,13 @@ int TestPushServantImp::doRequest(tars::TarsCurrentPtr current, vector<char>& re
     }
     if (stginfo.msgType == "heart")
     {
-        LOG->debug() << stginfo.brokerType <<"'s heart"<<endl;
+        LOG->debug() << stginfo.brokerType << "heart, requestid=" << stginfo.requestid << endl;
     }
-    else if(stginfo.msgType == "stgrsp")
+    else if (stginfo.msgType == "stgrsp")
     {
-        LOG->debug() << stginfo.brokerType <<"'s rsp"<<endl;
+        LOG->debug() << stginfo.brokerType << "rsp, requestid=" << stginfo.requestid << endl;
     }
-    
+
     (PushUser::mapMutex).unlock();
     //LOG->debug() << "request:"<<abc<<endl;
     return 0;
@@ -74,7 +74,7 @@ int TestPushServantImp::doClose(TarsCurrentPtr current)
             LOG->debug() << "close ip: " << keystr.str() << endl;
         }
     }
-    
+
 
     (PushUser::mapMutex).unlock();
 

@@ -22,7 +22,7 @@ private:
 	int _second;
 	bool _bTerminate;
 
-	Communicator _comm;
+	CommunicatorPtr _comm;
 
 	ServantPrx  _prx;
 };

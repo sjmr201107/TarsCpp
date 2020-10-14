@@ -111,16 +111,16 @@ int TestPushCallBack::onDispatch(ReqMessagePtr msg)
 
 RecvThread::RecvThread(int second):_second(second), _bTerminate(false)
 {   
-	string sObjName = "TestApp.PushServer.TestPushServantObj@tcp -h 192.168.1.72 -t 60000 -p 10099";
+	//string sObjName = "TestApp.PushServer.TestPushServantObj@tcp -h 192.168.1.72 -t 60000 -p 10099";
 
-    _prx = _comm.stringToProxy<ServantPrx>(sObjName);
-    /*_comm = new Communicator();
+    //_prx = _comm.stringToProxy<ServantPrx>(sObjName);
+    _comm = new Communicator();
     _comm->setProperty("property", "tars.tarsproperty.PropertyObj");
-    _comm->setProperty("locator", "tars.tarsregistry.QueryObj@tcp -h 192.168.1.119 -p 17890:tcp -h 192.168.1.24 -p 17890:tcp -h 192.168.1.69 -p 17890");
+    _comm->setProperty("locator", "tars.tarsregistry.QueryObj@tcp -h 192.168.1.153 -p 17890:tcp -h 192.168.1.24 -p 17890");
 
     _prx = _comm->stringToProxy<tars::ServantPrx>("TestApp.PushServer.TestPushServantObj");
     _prx->tars_timeout(10000);
-    _prx->tars_async_timeout(10000);*/
+    _prx->tars_async_timeout(10000);
 	ProxyProtocol prot;
     prot.requestFunc = pushRequest;
     prot.responseFunc = pushResponse;
@@ -146,8 +146,7 @@ void RecvThread::run(void)
     msgstg.brokerType = brokerType;
     msgstg.msg = stgbuf;
 
-    string buf = msgstg.writeToJsonString();
-
+    //---------------------------------------------------
 
     TestApp::StgRsp rsp;
     rsp.brokerType = brokerType;
@@ -155,10 +154,10 @@ void RecvThread::run(void)
     rsp.rspmsg = "rspmsg";
     string rspbuf = rsp.writeToJsonString();
 
-    msgstg.msgType = "stgrsp";
-    msgstg.brokerType = brokerType;
-    msgstg.msg = rsp.writeToJsonString();
-    string buf1 = msgstg.writeToJsonString();
+    TestApp::MsgStgInfo msgstg2;
+    msgstg2.msgType = "stgrsp";
+    msgstg2.brokerType = brokerType;
+    msgstg2.msg = rsp.writeToJsonString();
 
 	time_t n = TNOW;
 
@@ -167,13 +166,19 @@ void RecvThread::run(void)
 		{
 			try
 			{
-				TestPushCallBackPtr cb = new TestPushCallBack();
-				_prx->rpc_call_async(_prx->tars_gen_requestid(), "printResult", buf.c_str(), buf.length(), cb);
+				TestPushCallBackPtr cb = new TestPushCallBack();//给slp发送回报后，收到slp的响应
+                int requestid = _prx->tars_gen_requestid();
+                msgstg.requestid = requestid;
+                string buf = msgstg.writeToJsonString();
+				_prx->rpc_call_async(requestid, "printResult", buf.c_str(), buf.length(), cb);
                 {
-                    TC_ThreadLock::Lock sync(*this);
-                    timedWait(2000);
-                    //发送brokerType
-                    _prx->rpc_call_async(_prx->tars_gen_requestid(), "printResult", buf1.c_str(), buf1.length(), cb);
+                    //TC_ThreadLock::Lock sync(*this);
+                    //timedWait(2000);
+                    ////发送brokerType
+                    //requestid = _prx->tars_gen_requestid();
+                    //msgstg2.requestid = requestid;
+                    //string buf1 = msgstg2.writeToJsonString();
+                    //_prx->rpc_call_async(requestid, "printResult", buf1.c_str(), buf1.length(), cb);
                 }
 			}
 			catch(TarsException& e)

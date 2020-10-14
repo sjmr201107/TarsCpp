@@ -5,6 +5,7 @@ module TestApp
 		1 require string 	msgType="";
 		2 require string    brokerType="";
 		3 require string 	msg="";
+		4 require int		requestid;
 	};
 	
     struct StgInfo
